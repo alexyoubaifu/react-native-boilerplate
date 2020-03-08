@@ -1,8 +1,8 @@
 import React from 'react';
 import { Platform, Text, View, Button, ActivityIndicator, Image } from 'react-native';
-import { PropTypes } from 'prop-types';
 import Style from './ExampleScreenStyle';
 import { ApplicationStyles, Helpers, Images, Metrics } from 'App/Theme';
+import { inject, observer } from 'mobx-react';
 
 /**
  * This is an example of a container component.
@@ -16,12 +16,17 @@ const instructions = Platform.select({
   android: 'Double tap R on your keyboard to reload,\nShake or press menu button for dev menu.',
 });
 
+@inject('counter')
+@observer
 class ExampleScreen extends React.Component {
-  componentDidMount() {
-    this._fetchUser();
+  constructor(props) {
+    super(props);
   }
 
   render() {
+    const { counter } = this.props;
+    const { counter: value, incrementCounterAction, decrementCounterAction } = counter;
+
     return (
       <View
         style={[
@@ -40,41 +45,22 @@ class ExampleScreen extends React.Component {
             </View>
             <Text style={Style.text}>To get started, edit App.js</Text>
             <Text style={Style.instructions}>{instructions}</Text>
-            {this.props.userErrorMessage ? (
-              <Text style={Style.error}>{this.props.userErrorMessage}</Text>
-            ) : (
-              <View>
-                <Text style={Style.result}>
-                  {"I'm a fake user, my name is "}
-                  {this.props.user.name}
-                </Text>
-                <Text style={Style.result}>
-                  {this.props.liveInEurope ? 'I live in Europe !' : "I don't live in Europe."}
-                </Text>
-              </View>
-            )}
+            <Text>counter: {value}</Text>
             <Button
               style={ApplicationStyles.button}
-              onPress={() => this._fetchUser()}
-              title="Refresh"
+              onPress={() => incrementCounterAction()}
+              title="+1"
+            />
+            <Button
+              style={ApplicationStyles.button}
+              onPress={() => decrementCounterAction()}
+              title="-1"
             />
           </View>
         )}
       </View>
     );
   }
-
-  _fetchUser() {
-    this.props.fetchUser();
-  }
 }
-
-ExampleScreen.propTypes = {
-  user: PropTypes.object,
-  userIsLoading: PropTypes.bool,
-  userErrorMessage: PropTypes.string,
-  fetchUser: PropTypes.func,
-  liveInEurope: PropTypes.bool,
-};
 
 export default ExampleScreen;
